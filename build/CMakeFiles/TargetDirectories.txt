@@ -1,0 +1,16 @@
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/ROSBUILD_genmsg_cpp.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/ROSBUILD_genmsg_lisp.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/ROSBUILD_gensrv_cpp.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/ROSBUILD_gensrv_lisp.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/camera_subscriber.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/clean-test-results.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/rosbuild_precompile.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/rosbuild_premsgsrvgen.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/rospack_genmsg.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/rospack_genmsg_libexe.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/rospack_gensrv.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/test.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/test-future.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/test-results.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/test-results-run.dir
+/home/eddie/fuerte_workspace/image_ocr/build/CMakeFiles/tests.dir
