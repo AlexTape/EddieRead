@@ -19,12 +19,10 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 	sensor_msgs::CvBridge bridge;
 	try {
 
-		cvNamedWindow("OCR View", CV_WINDOW_AUTOSIZE);
-		cvMoveWindow("OCR View", 150, 150);
-		cvStartWindowThread();
-
-		// get initial timer
-		ROS_INFO("IMAGE_OCR Callback()");
+		// need a window?
+		//cvNamedWindow("OCR View", CV_WINDOW_AUTOSIZE);
+		//cvMoveWindow("OCR View", 150, 150);
+		//cvStartWindowThread();
 
 		// get single frame
 		IplImage* frame = bridge.imgMsgToCv(msg, "bgr8");
@@ -35,7 +33,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 		}
 
 		// do NOT release the frame!
-		cvShowImage("OCR View", frame);
+		//cvShowImage("OCR View", frame);
 
 		// save image
 		cvSaveImage("temp/capture.jpg", frame);
@@ -45,33 +43,34 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 		ocrCmdBuffer.str("");
 
 		/* Convert to tif for Tesseract */
-		ocrCmdBuffer << "convert -auto-level -type Grayscale temp/capture.jpg temp/capture.tif";
+		ocrCmdBuffer
+				<< "convert -auto-level -resize 200% temp/capture.jpg temp/capture.tif";
 		system(ocrCmdBuffer.str().data());
 
 		/* Process image (tif) and save it to <imgname>.tesseract.txt */
 		ocrCmdBuffer.str("");
-		ocrCmdBuffer << "tesseract temp/capture.tif temp/capture.tesseract -l eng";
+		ocrCmdBuffer
+				<< "tesseract temp/capture.tif temp/capture.tesseract -l eng >nul 2>&1";
 		system(ocrCmdBuffer.str().data());
 
 		/* Load the output of the OCR.
 		 * Dump it to the console and return it to the caller. */
 		std::ifstream inputFile("temp/capture.tesseract.txt");
 
-
-		std::cout << std::endl << std::endl <<"Read:" << std::endl << "---------------------------" << std::endl;
-		std::ostringstream returnBuffer;
-		returnBuffer.str("");
+		//std::cout << std::endl << std::endl <<"Read:" << std::endl << "---------------------------" << std::endl;
 		while (!inputFile.eof() && !inputFile.fail()) {
 			std::string line;
 			std::getline(inputFile, line);
-			std::cout << line << std::endl;
-			returnBuffer << line << std::endl;
+
+			if (!line.empty()) {
+				std::cout << "Read: " << line << std::endl;
+			}
 		}
-		std::cout << "---------------------------" << std::endl;
+		//std::cout << "---------------------------" << std::endl;
 		inputFile.clear();
 		inputFile.close();
 
-		cvDestroyWindow("OCR View");
+		//cvDestroyWindow("OCR View");
 
 	} catch (sensor_msgs::CvBridgeException& e) {
 
@@ -86,10 +85,11 @@ int main(int argc, char **argv) {
 
 	ros::NodeHandle nh;
 
+	ROS_INFO("IMAGE_OCR Callback() listening..");
+
 	image_transport::ImageTransport it(nh);
-	image_transport::Subscriber sub = it.subscribe("camera/rgb/image_color", 1,
+	image_transport::Subscriber sub = it.subscribe("camera/rgb/image_mono", 1,
 			imageCallback);
 
 	ros::spin();
 }
-
