@@ -15,8 +15,14 @@
 #include <iostream>
 #include <string>
 
+// mode switching commands
+std::string modeDictOn = "@ON";
+std::string modeDictOff = "@OFF";
+
 void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
+
 	sensor_msgs::CvBridge bridge;
+
 	try {
 
 		// need a window?
@@ -44,29 +50,115 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg) {
 
 		/* Convert to tif for Tesseract */
 		ocrCmdBuffer
-				<< "convert -auto-level -resize 200% temp/capture.jpg temp/capture.tif";
+		// with cropping
+				<< "convert -gravity Center -crop 50%\! temp/capture.jpg temp/capture.tif >/dev/null 2>&1";
+		// without cropping
+		//<< "convert temp/capture.jpg temp/capture.tif >/dev/null 2>&1";
+
 		system(ocrCmdBuffer.str().data());
 
 		/* Process image (tif) and save it to <imgname>.tesseract.txt */
 		ocrCmdBuffer.str("");
 		ocrCmdBuffer
-				<< "tesseract temp/capture.tif temp/capture.tesseract -l eng >nul 2>&1";
+				<< "tesseract temp/capture.tif temp/capture.tesseract -l eng >/dev/null 2>&1";
 		system(ocrCmdBuffer.str().data());
 
 		/* Load the output of the OCR.
 		 * Dump it to the console and return it to the caller. */
 		std::ifstream inputFile("temp/capture.tesseract.txt");
 
-		//std::cout << std::endl << std::endl <<"Read:" << std::endl << "---------------------------" << std::endl;
+		// read config file
+		bool isDictMode;
+		std::string stringMode;
+		std::ifstream modeFile("temp/mode.txt");
+		if (modeFile.is_open()) {
+
+			getline(modeFile, stringMode);
+
+			if (stringMode.find(modeDictOn) != std::string::npos) {
+
+				isDictMode = true;
+			} else {
+
+				isDictMode = false;
+			}
+
+			modeFile.close();
+		}
+
+		// read ocr result
 		while (!inputFile.eof() && !inputFile.fail()) {
+
 			std::string line;
 			std::getline(inputFile, line);
 
 			if (!line.empty()) {
+
 				std::cout << "Read: " << line << std::endl;
+			} else {
+
+				return;
+			}
+
+			// switch mode if needed
+			if (line.find(modeDictOn) != std::string::npos) {
+
+				std::string stringMode;
+				std::ofstream modeFile("temp/mode.txt");
+				if (modeFile.is_open()) {
+
+					modeFile << modeDictOn;
+					modeFile.close();
+				}
+
+				isDictMode = true;
+
+				system("echo 'Dictionary Mode enabled' | festival --tts");
+				ROS_INFO("Dictionary Mode enabled");
+				return;
+			}
+			if (line.find(modeDictOff) != std::string::npos) {
+
+				std::string stringMode;
+				std::ofstream modeFile("temp/mode.txt");
+				if (modeFile.is_open()) {
+
+					modeFile << modeDictOff;
+					modeFile.close();
+				}
+
+				isDictMode = false;
+
+				system("echo 'Dictionary Mode disabled' | festival --tts");
+				ROS_INFO("Dictionary Mode disabled");
+				return;
+			}
+
+			// is dictionary mode?
+			if (isDictMode == true) {
+
+				std::string house = "House";
+				if (line.find(house) != std::string::npos) {
+
+					system("echo 'House' | festival --tts");
+
+				}
+
+				std::string computer = "Computer";
+				if (line.find(computer) != std::string::npos) {
+
+					system("echo 'Computer' | festival --tts");
+
+				}
+			}
+
+			if (isDictMode == false) {
+
+				std::string command = "echo '" + line + "' | festival --tts";
+				system(command.c_str());
 			}
 		}
-		//std::cout << "---------------------------" << std::endl;
+
 		inputFile.clear();
 		inputFile.close();
 
@@ -84,6 +176,9 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "image_ocr");
 
 	ros::NodeHandle nh;
+
+	// set param for ocr mode
+	ros::param::set("ocr_dictionary", false);
 
 	ROS_INFO("IMAGE_OCR Callback() listening..");
 
