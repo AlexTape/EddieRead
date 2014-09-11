@@ -1,16 +1,16 @@
-ros-image-ocr
-=============
-
-Simple Subscriber with tesseract binding
-
+ros-image-ocr<br>
+=============<br>
+<br>
+Simple Subscriber with tesseract binding<br>
+<br>
 Installation Notes:
-http://www.parallax.com/downloads/propeller-Tool-Software
-git clone https://github.com/robotictang/eddiebot_firmware.git
-
-Environment Installation: Ubuntu 12.04 LTS + ROS
-
-  sudo apt-get –y update
-  sudo apt-get –y upgrade
+http://www.parallax.com/downloads/propeller-Tool-Software<br>
+git clone https://github.com/robotictang/eddiebot_firmware.git<br>
+<br>
+Environment Installation: Ubuntu 12.04 LTS + ROS<br>
+<br>
+  sudo apt-get –y update<br>
+  sudo apt-get –y upgrade<br>
   sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
   wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   sudo apt-get update
